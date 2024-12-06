@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator
+from django.contrib.auth.models import User
 
 class Estados(models.TextChoices):
     Activo = 'Activo'
@@ -16,10 +17,11 @@ class Categoria(models.Model):
 class Publicacion(models.Model):
     titulo = models.CharField(max_length=255)
     contenido = models.TextField()
-    duracion = models.IntegerField(validators=[MinValueValidator(1)])
-    imagen = models.ImageField(max_length=200, upload_to='imagenes/')
+    duracion = models.IntegerField(validators=[MinValueValidator(1)], help_text="Duración en minutos")
+    imagen = models.ImageField(max_length=200, upload_to='imagenes/', blank=True, null=True)
     estado = models.CharField(max_length=10, choices=Estados.choices, default=Estados.Activo)
     categoria = models.ForeignKey("Categoria", on_delete=models.CASCADE)
+    profesor = models.ForeignKey(User, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     
@@ -30,8 +32,20 @@ class Comentario(models.Model):
     contenido = models.TextField()
     estado = models.CharField(max_length=10, choices=Estados.choices, default=Estados.Activo)
     publicacion = models.ForeignKey("Publicacion", on_delete=models.CASCADE)
+    autor = models.ForeignKey(User, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     
+    def __str__(self):
+        return f"Comentario por {self.autor} en {self.publicacion}"
     
+class Like(models.Model):
+    publicacion = models.ForeignKey("Publicacion", on_delete=models.CASCADE)
+    autor = models.ForeignKey(User, on_delete=models.CASCADE)
+    
+    class Meta:
+        unique_together = ('publicacion', 'autor')
+    
+    def __str__(self):
+        return f"Like por {self.autor} en {self.publicacion}"
     
