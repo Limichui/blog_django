@@ -71,3 +71,4 @@ class Like(models.Model):
     def __str__(self):
         return f"Like por {self.autor} en {self.publicacion}"
     
+    

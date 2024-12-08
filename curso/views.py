@@ -1,7 +1,9 @@
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
+from rest_framework import viewsets
 from .forms import PublicacionForm, ComentarioForm
 from .models import Categoria, Publicacion, Comentario
+from .serializers import CategoriaSerializer, PublicacionSerializer
 
 def index(request):
     return HttpResponse("Blog Aprendea programar")
@@ -56,3 +58,11 @@ def comentarioFormView(request):
     return render(request, "form_comentarios.html", {"form": form})
     
     
+class CategoriaViewSet(viewsets.ModelViewSet):
+    queryset = Categoria.objects.all()
+    serializer_class = CategoriaSerializer
+    
+class PublicacionViewSet(viewsets.ModelViewSet):
+    queryset = Publicacion.objects.all()
+    serializer_class = PublicacionSerializer
+
