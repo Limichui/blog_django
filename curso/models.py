@@ -1,6 +1,13 @@
 from django.db import models
 from django.core.validators import MinValueValidator
 from django.contrib.auth.models import User
+import uuid
+import os
+
+def unique_image_path(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = f"{uuid.uuid4().hex}.{ext}"
+    return os.path.join('imagenes/', filename)
 
 class Estados(models.TextChoices):
     Activo = 'Activo'
@@ -18,7 +25,7 @@ class Publicacion(models.Model):
     titulo = models.CharField(max_length=255)
     contenido = models.TextField()
     duracion = models.IntegerField(validators=[MinValueValidator(1)], help_text="Duración en minutos")
-    imagen = models.ImageField(max_length=200, upload_to='imagenes/', blank=True, null=True)
+    imagen = models.ImageField(max_length=200, upload_to=unique_image_path, blank=True, null=True)
     estado = models.CharField(max_length=10, choices=Estados.choices, default=Estados.Activo)
     categoria = models.ForeignKey("Categoria", on_delete=models.CASCADE)
     profesor = models.ForeignKey(User, on_delete=models.CASCADE)
