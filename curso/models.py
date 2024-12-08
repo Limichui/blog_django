@@ -1,8 +1,10 @@
 from django.db import models
-from django.core.validators import MinValueValidator
+from .validators import validar_numeros_positivos, validar_longitud_minima, validar_longitud_maxima, validar_numeros_valor_maximo
+# from django.core.validators import MinValueValidator
 from django.contrib.auth.models import User
 import uuid
 import os
+
 
 def unique_image_path(instance, filename):
     ext = filename.split('.')[-1]
@@ -14,7 +16,10 @@ class Estados(models.TextChoices):
     Inactivo = 'Inactivo'
 
 class Categoria(models.Model):
-    nombre = models.CharField(max_length=100)
+    nombre = models.CharField(
+        max_length=100,
+        validators=[validar_longitud_minima, validar_longitud_maxima],
+    )
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     
@@ -22,9 +27,17 @@ class Categoria(models.Model):
         return self.nombre
     
 class Publicacion(models.Model):
-    titulo = models.CharField(max_length=255)
+    titulo = models.CharField(
+        max_length=255,
+        validators=[validar_longitud_minima, validar_longitud_maxima], 
+    )
     contenido = models.TextField()
-    duracion = models.IntegerField(validators=[MinValueValidator(1)], help_text="Duración en minutos")
+    duracion = models.IntegerField(
+        validators=[
+            validar_numeros_positivos, validar_numeros_valor_maximo,
+        ], 
+        help_text="Duración en minutos",
+    )
     imagen = models.ImageField(max_length=200, upload_to=unique_image_path, blank=True, null=True)
     estado = models.CharField(max_length=10, choices=Estados.choices, default=Estados.Activo)
     categoria = models.ForeignKey("Categoria", on_delete=models.CASCADE)
@@ -36,7 +49,9 @@ class Publicacion(models.Model):
         return self.titulo
     
 class Comentario(models.Model):
-    contenido = models.TextField()
+    contenido = models.TextField(
+        validators=[validar_longitud_minima],
+    )
     estado = models.CharField(max_length=10, choices=Estados.choices, default=Estados.Activo)
     publicacion = models.ForeignKey("Publicacion", on_delete=models.CASCADE)
     autor = models.ForeignKey(User, on_delete=models.CASCADE)
