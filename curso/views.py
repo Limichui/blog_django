@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
-from rest_framework import viewsets
+from rest_framework import viewsets, generics
 from .forms import PublicacionForm, ComentarioForm
 from .models import Categoria, Publicacion, Comentario
 from .serializers import CategoriaSerializer, PublicacionSerializer
@@ -65,4 +65,12 @@ class CategoriaViewSet(viewsets.ModelViewSet):
 class PublicacionViewSet(viewsets.ModelViewSet):
     queryset = Publicacion.objects.all()
     serializer_class = PublicacionSerializer
+    
+class PublicacionListView(generics.ListAPIView):
+    serializer_class = PublicacionSerializer
+
+    def get_queryset(self):
+        return Publicacion.objects.filter(estado='Activo')
+    
+    
 

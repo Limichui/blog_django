@@ -1,5 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
+from .views import PublicacionListView
 from . import views
 
 router = DefaultRouter()
@@ -16,5 +17,7 @@ urlpatterns = [
     path('comentarios_form/', views.comentarioFormView, name='comentario'),
     
     # Apis
-    path('api/', include(router.urls)),
+    path('', include(router.urls)),
+    path('cursos/', PublicacionListView.as_view(), name='publicacion-list'),
+    
 ]

@@ -23,5 +23,6 @@ from django.shortcuts import redirect
 urlpatterns = [
     path('', lambda request: redirect('cursos/', permanent=False)),
     path('admin/', admin.site.urls),
-    path('cursos/', include('curso.urls'))
+    path('cursos/', include('curso.urls')),
+    path('api/', include('curso.urls')) # Para apis
 ]
