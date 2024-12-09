@@ -19,5 +19,6 @@ urlpatterns = [
     # Apis
     path('', include(router.urls)),
     path('cursos/', PublicacionListView.as_view(), name='publicacion-list'),
+    path('categoria/count_publicacion/', views.categoria_count, name='categoria-count'),
     
 ]

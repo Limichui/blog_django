@@ -1,9 +1,14 @@
-from django.http import HttpResponse
+
+from django.http import HttpResponse, JsonResponse
+from django.db.models import Count
+
 from django.shortcuts import render, get_object_or_404
 from rest_framework import viewsets, generics
+from rest_framework.decorators import api_view
 from .forms import PublicacionForm, ComentarioForm
 from .models import Categoria, Publicacion, Comentario
 from .serializers import CategoriaSerializer, PublicacionSerializer
+
 
 def index(request):
     return HttpResponse("Blog Aprendea programar")
@@ -57,7 +62,7 @@ def comentarioFormView(request):
         
     return render(request, "form_comentarios.html", {"form": form})
     
-    
+# Para ModelViewSet   
 class CategoriaViewSet(viewsets.ModelViewSet):
     queryset = Categoria.objects.all()
     serializer_class = CategoriaSerializer
@@ -65,12 +70,28 @@ class CategoriaViewSet(viewsets.ModelViewSet):
 class PublicacionViewSet(viewsets.ModelViewSet):
     queryset = Publicacion.objects.all()
     serializer_class = PublicacionSerializer
-    
+
+# Para GenericAPIView
 class PublicacionListView(generics.ListAPIView):
     serializer_class = PublicacionSerializer
 
     def get_queryset(self):
         return Publicacion.objects.filter(estado='Activo')
     
-    
+# Para Custom API
+@api_view(["GET"])
+def categoria_count(request):
+    try:
+        categorias = Categoria.objects.all()
+        data = []
 
+        for categoria in categorias:
+            publicaciones_count = Publicacion.objects.filter(categoria=categoria).count()
+            data.append({
+                "categoria": categoria.nombre,
+                "publicaciones_count": publicaciones_count,
+            })
+
+        return JsonResponse(data, safe=False, status=200)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, safe=False, status=500)
